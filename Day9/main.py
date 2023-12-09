@@ -4,6 +4,7 @@ import math
 
 f = "input.txt"
 
+#### FROM https://github.com/monpie3/adventOfCode2023/tree/master/Day_9
 def go_down(current_line):
     sequence_below = []
     if len(set(current_line)) == 1:
@@ -40,6 +41,7 @@ def extrapolate_history(line):
     for s in sequences:
         print(s)
     return r
+#### END copy of golden version
 
 total = 0
 with open(f) as fp:

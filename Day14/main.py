@@ -21,44 +21,55 @@ def timer_func(func):
 f = "input.txt"
 grid = []
 
+def tilt (row):
+    """Split the lines by "#", remove the "O" from the left side of the chunks and add them to the right side."""
+    # return ["#".join([chunk.replace("O", "") + "O" * chunk.count("O") for chunk in line.split("#")]) for line in lines]
+    return "#".join(["O" * chunk.count("O") + chunk.replace("O", "") for chunk in ''.join(row.tolist()).split("#")])
+
+
 def shift_line(row):
+    r = np.array([x for x in tilt(row)])
+    #print(f"{row} -> {r}")
+    return r
+
     # shift 0s to left, stopping at #s
-    size = len(row)
-    for i in range(0, size):
-        for j in range(0, size - i - 1):
-            a = row[j]
-            b = row[j+1]
-            if row[j] == "." and row[j + 1] == "O":
-                row[j] = "O"
-                row[j+1] = '.'
-    return row
+    # size = len(row)
+    # for i in range(0, size):
+    #     for j in range(0, size - i - 1):
+    #         a = row[j]
+    #         b = row[j+1]
+    #         if row[j] == "." and row[j + 1] == "O":
+    #             row[j] = "O"
+    #             row[j+1] = '.'
+    # return row
 
 def matrix_print(a):
     print("\n".join(["".join([i for i in row]) for row in a]))
 
-@timer_func
+
 def orient_matrix(u, d):
-    r = d % 4
+    r = d % 4 if d >= 0 else -1
     return np.rot90(u, k = r)
 
-@timer_func
+
 def shift_all(uni):
     for i in range(len(uni)):
         uni[i] = shift_line(uni[i])
 
-@timer_func
+
 def shift_rocks(uni, rotate):
     uc = np.copy(uni)
     uni_y = np.rot90(uc)
+
     i = 0
 
-    shift_all(uni)
+    shift_all(uni_y)
 
     d = -1
     while rotate > 0:
         d += 1
         uni_y = np.rot90(uni_y, k=-1)
-        shift_all(uni)
+        shift_all(uni_y)
         rotate -= 1
         #matrix_print(orient_matrix(uni_y, d))
         #print("\n")
@@ -114,6 +125,12 @@ def find_oscillation(l):
 
 p = find_oscillation([1,2,3,4,5,6,7,8,9,6,7,8,6,7,8,9,6,7,8,6,7,8,9,6])
 print(f"osc = {p}")
+
+print("one full rotation")
+matrix_print(shift_rocks(uni, 3))
+print('\n')
+matrix_print(shift_rocks(uni, 7))
+
 
 w = []
 find = 0

@@ -21,6 +21,8 @@ for ch in line:
 c = Counter(houses)
 print(f"part 1: num of houses : {len(c.keys())}")
 
+#stuff goes here
+
 houses = [(0,0)]
 s_pos = (0,0)
 r_pos = (0,0)

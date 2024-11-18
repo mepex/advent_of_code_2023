@@ -50,6 +50,7 @@ def visualize_lights(instructions, vmax = 1):
 
     ani = FuncAnimation(fig, update, frames=range(len(instructions)), interval=20, repeat=False)
     plt.show()
+    return ani
 
 
 with open(f, 'r') as fp:
@@ -63,4 +64,5 @@ for i in instructions:
 max = grid.max()
 
 print(f"total: {grid.sum()}")
-visualize_lights(instructions, max)
+ani = visualize_lights(instructions, max)
+ani.save('test_anim.mp4', fps=30, extra_args=['-vcodec', 'libx264'])

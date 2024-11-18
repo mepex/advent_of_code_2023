@@ -1,0 +1,8 @@
+turn off 1,1 through 4,1
+toggle 3,5 through 9,9
+toggle 5,7 through 7,9
+turn off 6,5 through 9,1
+turn off 3,3 through 6,8
+turn off 1,1 through 4,1
+toggle 3,5 through 9,9
+toggle 5,7 through 6,9

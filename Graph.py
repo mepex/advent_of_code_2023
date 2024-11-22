@@ -12,8 +12,8 @@ class Graph(object):
 
     def __init__(self, connections=None, directed=False, weighted=False):
         if connections is None:
-            connections = {}
-        self._graph = defaultdict()
+            connections = defaultdict()
+        self._graph = defaultdict(set)
         self._directed = directed
         self._weighted = weighted
         self.add_connections(connections)

@@ -5,7 +5,7 @@ from heapq import heapify, heappop, heappush
 
 class Graph(object):
     """ Graph data structure, undirected by default. """
-    """ Implemented as adjacency matrix- each node has a list with all the nodes it's connected to"""
+    """ Implemented as adjacency list- each node has a list with all the nodes it's connected to"""
     _nodes = set()
     _adjacency_matrix = None
     _has_hamilton_cycle = False
@@ -32,7 +32,6 @@ class Graph(object):
 
     @directed.setter
     def directed(self, value):
-
         self._directed = value
 
     @property
@@ -49,7 +48,6 @@ class Graph(object):
 
     def add_connections(self, connections):
         """ Add connections (list of tuple pairs) to graph """
-
         for c in connections:
             if self._weighted:
                 self.add(c[0], c[1], c[2])
@@ -86,7 +84,6 @@ class Graph(object):
 
     def is_connected(self, node1, node2):
         """ Is node1 directly connected to node2 """
-
         return node1 in self._graph and node2 in self._graph[node1]
 
     def get_connections(self, node1):
@@ -94,7 +91,6 @@ class Graph(object):
 
     def find_path(self, node1, node2, path=None):
         """ Find any path between node1 and node2 (may not be shortest) """
-
         if path is None:
             path = []
         path = path + [node1]
@@ -120,7 +116,7 @@ class Graph(object):
             path_count[k] = 0
         # Call the recursive helper
         # function to print all paths
-        self.count_paths_util(s, d, visited, path_count)
+        self._count_paths_util(s, d, visited, path_count)
         return path_count[d]
 
     # A recursive function to print all paths
@@ -128,8 +124,8 @@ class Graph(object):
     # of vertices in current path. path[]
     # stores actual vertices and path_index
     # is current index in path[]
-    def count_paths_util(self, u, d,
-                         visited, path_count):
+    def _count_paths_util(self, u, d,
+                          visited, path_count):
         visited[u] = True
 
         # If current vertex is same as
@@ -144,7 +140,7 @@ class Graph(object):
             # adjacent to current vertex
             for i in self._graph[u]:
                 if not visited[i]:
-                    self.count_paths_util(i, d, visited, path_count)
+                    self._count_paths_util(i, d, visited, path_count)
 
         visited[u] = False
 
@@ -229,6 +225,9 @@ class Graph(object):
         return path
 
     def make_adjacency_matrix(self):
+        """
+            An adjacency matrix is a 2d array that has a 1 if [i][j] are connected, otherwise 0
+        """
         self._adjacency_matrix = []
         sn = sorted(self._nodes)
         for i in range(len(sn)):
@@ -238,7 +237,7 @@ class Graph(object):
                 x = sn.index(j)
                 self._adjacency_matrix[i][x] = 1
 
-    def is_safe_to_add(self, v, pos, path):
+    def _is_safe_to_add(self, v, pos, path):
         # if v is also connected to previous vertex in path, not safe
         if self.adjacency_matrix[path[-1][pos - 1]][v] == 0:
             return False
@@ -249,7 +248,7 @@ class Graph(object):
 
         return True
 
-    def hamiltonian_cycle_util(self, path, pos, visited):
+    def _hamiltonian_cycle_util(self, path, pos, visited):
         if pos == len(self.nodes):
             if self.adjacency_matrix[path[-1][pos - 1]][path[-1][0]] == 1:
                 # found a path, now make a new possible path
@@ -258,11 +257,11 @@ class Graph(object):
             return
 
         for v in range(1, len(self.nodes)):
-            if self.is_safe_to_add(v, pos, path) and not visited[v]:
+            if self._is_safe_to_add(v, pos, path) and not visited[v]:
                 path[-1].append(v)
                 visited[v] = True
 
-                self.hamiltonian_cycle_util(path, pos + 1, visited)
+                self._hamiltonian_cycle_util(path, pos + 1, visited)
 
                 visited[v] = False
                 path[-1].pop()
@@ -274,7 +273,7 @@ class Graph(object):
         visited = [False] * len(self.nodes)
         visited[0] = True
 
-        self.hamiltonian_cycle_util(path, 1, visited)
+        self._hamiltonian_cycle_util(path, 1, visited)
         path.pop()
         if len(path) == 0:
             return None

@@ -10,8 +10,10 @@ class Graph(object):
     _adjacency_matrix = None
     _has_hamilton_cycle = False
 
-    def __init__(self, connections={}, directed=False, weighted=False):
-        self._graph = defaultdict(set)
+    def __init__(self, connections=None, directed=False, weighted=False):
+        if connections is None:
+            connections = {}
+        self._graph = defaultdict()
         self._directed = directed
         self._weighted = weighted
         self.add_connections(connections)
@@ -55,7 +57,11 @@ class Graph(object):
                 self.add(c[0], c[1])
 
     def add(self, node1, node2, weight=0):
-        """ Add connection between node1 and node2 """
+        """ Add connection between node1 and node2
+        :param node1:
+        :param node2:
+        :param weight:
+        """
         self._nodes.add(node1)
         self._nodes.add(node2)
         if not isinstance(self._graph[node1], dict):
@@ -68,8 +74,7 @@ class Graph(object):
 
     def remove(self, node):
         """ Remove all references to node """
-
-        for n, cxns in self._graph.items():  # python3: items(); python2: iteritems()
+        for node, cxns in self._graph.items():  # python3: items(); python2: iteritems()
             try:
                 cxns.remove(node)
             except KeyError:
@@ -87,9 +92,11 @@ class Graph(object):
     def get_connections(self, node1):
         return list(self._graph[node1])
 
-    def find_path(self, node1, node2, path=[]):
+    def find_path(self, node1, node2, path=None):
         """ Find any path between node1 and node2 (may not be shortest) """
 
+        if path is None:
+            path = []
         path = path + [node1]
         if node1 == node2:
             return path
@@ -102,33 +109,33 @@ class Graph(object):
                     return new_path
         return None
 
-    def countPaths(self, s, d):
+    def count_paths(self, s, d):
 
         # Mark all the vertices
         # as not visited
         visited = {}
-        pathCount = {}
+        path_count = {}
         for k in self._nodes:
             visited[k] = False
-            pathCount[k] = 0
+            path_count[k] = 0
         # Call the recursive helper
         # function to print all paths
-        self.countPathsUtil(s, d, visited, pathCount)
-        return pathCount[d]
+        self.count_paths_util(s, d, visited, path_count)
+        return path_count[d]
 
     # A recursive function to print all paths
     # from 'u' to 'd'. visited[] keeps track
     # of vertices in current path. path[]
     # stores actual vertices and path_index
     # is current index in path[]
-    def countPathsUtil(self, u, d,
-                       visited, pathCount):
+    def count_paths_util(self, u, d,
+                         visited, path_count):
         visited[u] = True
 
         # If current vertex is same as
         # destination, then increment count
         if u == d:
-            pathCount[u] += 1
+            path_count[u] += 1
 
         # If current vertex is not destination
         else:
@@ -137,7 +144,7 @@ class Graph(object):
             # adjacent to current vertex
             for i in self._graph[u]:
                 if not visited[i]:
-                    self.countPathsUtil(i, d, visited, pathCount)
+                    self.count_paths_util(i, d, visited, path_count)
 
         visited[u] = False
 
@@ -198,7 +205,7 @@ class Graph(object):
     def get_path_weight(self, path):
         w = 0
         for i in range(len(path) - 1):
-            w += self._graph[path[i]][path[i+1]]
+            w += self._graph[path[i]][path[i + 1]]
         return w
 
     def get_hamiltonian_paths(self, start_v):
@@ -225,9 +232,9 @@ class Graph(object):
         self._adjacency_matrix = []
         sn = sorted(self._nodes)
         for i in range(len(sn)):
-            n = sn[i]
+            node = sn[i]
             self._adjacency_matrix.append([0] * len(sn))
-            for j in self._graph[n].keys():
+            for j in self._graph[node].keys():
                 x = sn.index(j)
                 self._adjacency_matrix[i][x] = 1
 
@@ -259,7 +266,6 @@ class Graph(object):
 
                 visited[v] = False
                 path[-1].pop()
-
 
     def get_hamiltonian_cycles(self):
         # A list of paths, will find all paths
@@ -310,7 +316,7 @@ if __name__ == '__main__':
     pretty_print.pprint(G.adjacency_matrix)
     print('Hamiltonian paths:')
     for n in G.nodes:
-      pretty_print.pprint(G.get_hamiltonian_paths(n))
+        pretty_print.pprint(G.get_hamiltonian_paths(n))
 
     paths = G.get_hamiltonian_cycles()
     print("Hamiltonian cycles:")
@@ -339,8 +345,6 @@ if __name__ == '__main__':
     #
     # b2f = G.shortest_path("B", "F")
     # print(f"The shortest distance from B to F is {b2f}")
-
-
 
     #
     # connections = [('0,0', '1,0'), ('0,0', '1,1')]

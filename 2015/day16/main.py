@@ -58,7 +58,7 @@ for i in range(1, len(sues)):
                 found = False
                 break
     if found:
-        print(f"part 1: found: {i} : {sues[i]}")
+        print(f"part 2: found: {i} : {sues[i]}")
 
 
 

@@ -15,8 +15,8 @@ def look_dir(grid, i, j, m, inc):
     Looks for a string in a grid of characters, any direction is safe because Index
     :param grid: array of strings
     :param i: starting index for y
-    :param j: starting index for j
-    :param m: string to match to
+    :param j: starting index for x
+    :param m: string to look for
     :param inc: a tuple that indicates the direction to look e.g (0,1) means look to the right, (-1,-1)
     means look up and to the left
     :return: 1 if found, 0 otherwise

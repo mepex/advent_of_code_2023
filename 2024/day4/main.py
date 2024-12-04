@@ -12,7 +12,7 @@ w = len(grid[0])
 
 def look_dir(grid, i, j, m, inc):
     """
-    Looks for a string in a grid of characters
+    Looks for a string in a grid of characters, any direction is safe because Index
     :param grid: array of strings
     :param i: starting index for y
     :param j: starting index for j
@@ -26,6 +26,8 @@ def look_dir(grid, i, j, m, inc):
     try:
         l = ''
         for x in range(len(m)):
+            if my_i < 0 or my_j < 0:
+                raise IndexError
             l += grid[my_i][my_j]
             my_i += inc[0]
             my_j += inc[1]

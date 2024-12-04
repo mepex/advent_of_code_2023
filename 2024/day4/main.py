@@ -1,4 +1,4 @@
-f = ("input.txt")
+f = ("sample.txt")
 total = 0
 grid = []
 with open(f) as fp:
@@ -8,6 +8,32 @@ with open(f) as fp:
 
 h = len(grid)
 w = len(grid[0])
+
+
+def look_dir(grid, i, j, m, inc):
+    """
+    Looks for a string in a grid of characters
+    :param grid: array of strings
+    :param i: starting index for y
+    :param j: starting index for j
+    :param m: string to match to
+    :param inc: a tuple that indicates the direction to look e.g (0,1) means look to the right, (-1,-1)
+    means look up and to the left
+    :return: 1 if found, 0 otherwise
+    """
+    my_i = i
+    my_j = j
+    try:
+        l = ''
+        for x in range(len(m)):
+            l += grid[my_i][my_j]
+            my_i += inc[0]
+            my_j += inc[1]
+        if l == m:
+            return 1
+    except IndexError:
+        return 0
+    return 0
 
 def look(grid, i, j):
     global lookfor
@@ -74,6 +100,14 @@ found = 0
 for i in range(h):
     for j in range(w):
         found += look(grid, i, j)
+        print(f"{i},{j} east: {look_dir(grid, i, j, 'XMAS', (0, 1))}")
+        print(f"{i},{j} west: {look_dir(grid, i, j, 'XMAS', (0, -1))}")
+        print(f"{i},{j} north: {look_dir(grid, i, j, 'XMAS', (-1, 0))}")
+        print(f"{i},{j} south: {look_dir(grid, i, j, 'XMAS', (1, 0))}")
+        print(f"{i},{j} southeast: {look_dir(grid, i, j, 'XMAS', (1, 1))}")
+        print(f"{i},{j} southwest: {look_dir(grid, i, j, 'XMAS', (1,-1))}")
+        print(f"{i},{j} northeast: {look_dir(grid, i, j, 'XMAS', (-1, 1))}")
+        print(f"{i},{j} northwest: {look_dir(grid, i, j, 'XMAS', (-1, -1))}")
 
 print(f"part 1 found : {found}")
 

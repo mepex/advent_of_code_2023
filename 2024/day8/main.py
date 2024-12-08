@@ -1,6 +1,7 @@
 import re
 from itertools import combinations
 from pprint import pprint
+from mymodule import *
 
 grid = []
 nodes = {}
@@ -38,11 +39,13 @@ print("antinodes")
 print(sorted(antinodes))
 print(f"part 1: number of antinodes: {len(set(antinodes))}")
 
+
 def in_grid(n):
     global size
     if n[0] < 0 or n[1] < 0 or n[0] >= size[0] or n[1] >= size[1]:
         return False
     return True
+
 
 antinodes = []
 for n in nodes.keys():
@@ -73,14 +76,12 @@ print("antinodes")
 print(sorted(antinodes))
 
 for n in antinodes:
-    grid[n[0]] = grid[n[0]][:n[1]] + '#' + grid[n[0]][(n[1]+1):]
+    grid[n[0]] = replace_char_in_str(grid[n[0]], n[1], '#')
 
 for n in nodes.keys():
-   for x in nodes[n]:
-       grid[x[0]] = grid[x[0]][:x[1]] + n + grid[x[0]][(x[1]+1):]
+    for x in nodes[n]:
+        grid[x[0]] = replace_char_in_str(grid[x[0]], x[1], n)
 
 pprint(grid)
 
 print(f"part 2: number of antinodes: {len(set(antinodes))}")
-
-

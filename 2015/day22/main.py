@@ -55,9 +55,9 @@ def sim(actions):
             if mana < 0:
                 return 0
             mana_spent += spell_cost[act]
-            if act == "M"
+            if act == "M":
                 boss_hp -= 4
-            elif act == 'D'
+            elif act == 'D':
                 boss_hp -= 2
                 hp += 2
             elif act == 'S'

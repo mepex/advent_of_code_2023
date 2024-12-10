@@ -18,6 +18,13 @@ def get_grid_of_ints(f):
             grid.append([int(x) for x in line.split()])
     return np.array(grid)
 
+def get_grid_of_digits(f):
+    grid = []
+    with open(f) as fp:
+        for line in fp:
+            grid.append([int(x) for x in list(line.strip())])
+    return np.array(grid)
+
 
 def get_lines(f):
     with open(f) as fp:

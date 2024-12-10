@@ -17,12 +17,15 @@ for i in range(len(blocks)):
 
 gold_disk = disk.copy()
 
-print(f"Found {i//2} files")
+print(f"Found {i // 2} files")
+
+
 def get_element(d, e):
     try:
         return d.index(e)
     except ValueError:
         return -1
+
 
 e = get_element(disk, -1)
 while e != -1:
@@ -42,6 +45,7 @@ for i in range(len(disk)):
 
 print(f"part 1: {checksum}")
 
+
 def map_blanks(fs):
     blank_map = []
     size = 0
@@ -56,6 +60,7 @@ def map_blanks(fs):
                 blank_map.append((start, size))
             size = 0
     return blank_map
+
 
 file_map = []
 size = 0
@@ -77,11 +82,10 @@ for i in range(len(gold_disk)):
 if size > 0:
     file_map.append((start, size))
 
-
 disk = gold_disk.copy()
 
 blank_map = map_blanks(disk)
-for i in range(len(file_map)-1 , -1, -1):
+for i in range(len(file_map) - 1, -1, -1):
     f = file_map[i]
     for j in range(len(blank_map)):
         b = blank_map[j]
@@ -98,8 +102,3 @@ for i in range(len(disk)):
         checksum += i * disk[i]
 
 print(f"part 2: {checksum}")
-
-
-
-
-

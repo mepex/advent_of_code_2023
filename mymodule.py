@@ -36,3 +36,18 @@ def replace_char_in_str(s, index, ch):
     return s[:index] + ch + s[index + 1:]
 
 
+def get_grid_neighbors(shape, y, x):
+    n = []
+    # left
+    n.append((y, max(x - 1, 0)))
+    # right
+    n.append((y, min(x + 1, shape[0] - 1)))
+    # up
+    n.append((max(0, y - 1), x))
+    # down
+    n.append((min(y + 1, shape[0] - 1), x))
+    while (y, x) in n:
+        n.remove((y, x))
+    return list(set(n))
+
+

@@ -60,7 +60,7 @@ def visualize_lights(frames, vmax = 1):
         #print(f"{frame}\n{im.get_array()}\n")
         return [im]
 
-    ani = FuncAnimation(fig, update, frames=range(len(frames)), interval=200, repeat=False)
+    ani = FuncAnimation(fig, update, frames=range(len(frames)), interval=20, repeat=False)
     plt.show()
     return ani
 

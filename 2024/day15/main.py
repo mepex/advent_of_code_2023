@@ -157,55 +157,133 @@ def push_lr(grid, pos, direction):
     exit(1)
 
 def do_moves(grid, moves):
-    for move in moves:
-        m_ch = move[0]
-        p = move[1]
-        n = move[2]
+    for k, v in moves.items():
+        m_ch = v
+        n = k
         grid[n[0]] = replace_char_in_str(grid[n[0]], n[1], m_ch)
 
-def push_ud(grid, pos, direction, moves):
+
+
+def push_ud2(grid, pos, direction, replace):
+    """
+    Move the box at a time, not just column
+    :param grid:
+    :param pos:
+    :param direction:
+    :return:
+    """
     global dir_hash, reverse_dir_hash
     d = dir_hash[direction]
+    rd = reverse_dir_hash[direction]
     ch = grid[pos[0]][pos[1]]
-    next = list(map(add, pos, d))
+    next = tuple(map(add, pos, d))
     gridch = grid[next[0]][next[1]]
+    moves = {}
+    # only operate on the left side of the box
+    if ch == '[':
+        moves[tuple(pos)] = replace[0]
+        moves[(pos[0], pos[1] + 1)] = replace[1]
+        moves[next] = '['
+        moves[(next[0], next[1] + 1)] = ']'
+        if gridch == '[':
+            r, m = push_ud2(grid, next, direction, "[]")
+            if r[0] != pos[0]:
+                moves.update(m)
+                return pos, moves
+            else:
+                rd = reverse_dir_hash[direction]
+                back = list(map(add, pos, rd))
+                return back, {}
+        elif gridch == ']':
+            r, m = push_ud2(grid, [next[0], next[1] - 1], direction, ".[")
+            r2, m2 = push_ud2(grid, [next[0], next[1] + 1], direction, "].")
+            if r[0] != pos[0] != r2[0]:
+                moves.update(m)
+                moves.update(m2)
+                return pos, moves
+            else:
+                rd = reverse_dir_hash[direction]
+                back = list(map(add, pos, rd))
+                return back, {}
+        elif gridch == '#':
+            back = list(map(add, pos, rd))
+            return back, {}
+        elif gridch == '.':
+            other = grid[next[0]][next[1] + 1]
+            if other == '#':
+                back = list(map(add, pos, rd))
+                return back, {}
+            elif other == '[':
+                r, m = push_ud2(grid, [next[0], next[1] +  1], direction, "].")
+                if r[0] != pos[0]:
+                    moves.update(m)
+                    return pos, moves
+                else:
+                    rd = reverse_dir_hash[direction]
+                    back = list(map(add, pos, rd))
+                    return back, {}
+            elif other == '.':
+                moves[next] = ch
+                return pos, moves
+    elif ch == ']':
+        r, m = push_ud2(grid, [pos[0], pos[1] - 1], direction, "..")
+        return (r[0], r[1]+1), m
+    else:
+        rd = reverse_dir_hash[direction]
+        back = list(map(add, pos, rd))
+        return back, {}
+
+
+
+
+def push_ud(grid, pos, direction):
+    global dir_hash, reverse_dir_hash
+    d = dir_hash[direction]
+    rd = reverse_dir_hash[direction]
+    ch = grid[pos[0]][pos[1]]
+    next = tuple(map(add, pos, d))
+    gridch = grid[next[0]][next[1]]
+    moves = {}
+    moves[tuple(pos)] = '.'
+    if ch == '[':
+        moves[(pos[0], pos[1] + 1)] = '.'
+    elif ch == ']':
+        moves[(pos[0], pos[1] - 1)] = '.'
     if gridch == '[':
-        moves.append([ch, pos, next])
-        r, m = push_ud(grid, next, direction, moves)
-        moves.append(['.', pos, [next[0], next[1]+1]])
-        r2, m2 = push_ud(grid, [next[0], next[1]+1], direction, moves)
+        # moves.append([ch, next])
+        moves[next] = ch
+        r, m = push_ud(grid, next, direction)
+        r2, m2 = push_ud(grid, [next[0], next[1]+1], direction)
         # must be successful in pushing both sides of the box for it to move
         if r[0] != pos[0] and r2[0] != pos[0]:
-            do_moves(grid, m + m2)
-            return pos, []
+            moves.update(m)
+            moves.update(m2)
+            return pos, moves
         else:
             # if we didn't successfully push boxes we gotta backtrack
             rd = reverse_dir_hash[direction]
             back = list(map(add, pos, rd))
-            return back, []
+            return back, {}
     elif gridch == ']':
-        moves.append([ch, pos, next])
-        r, m = push_ud(grid, next, direction, moves)
-        moves.append(['.', pos, [next[0], next[1] - 1]])
-        r2, m2 = push_ud(grid, [next[0], next[1] - 1], direction, moves)
+        moves[next] = ch
+        r, m = push_ud(grid, next, direction)
+        r2, m2 = push_ud(grid, [next[0], next[1] - 1], direction)
         if r[0] != pos[0] and r2[0] != pos[0]:
-            do_moves(grid, m + m2)
-            return pos, []
+            moves.update(m)
+            moves.update(m2)
+            return pos, moves
         else:
             # if we didn't successfully push boxes we gotta backtrack
-            rd = reverse_dir_hash[direction]
             back = list(map(add, pos, rd))
-            return back, []
+            return back, {}
     elif gridch == '#':
         # gotta go backwards if we run into the wall
-        rd = reverse_dir_hash[direction]
         back = list(map(add, pos, rd))
         return back, moves
     elif gridch == '.':
         # instead of moving the char immediately, create a record that we might apply later
-        moves.append([ch, pos, next])
-        #grid[next[0]] = replace_char_in_str(grid[next[0]], next[1], ch)
-        #grid[pos[0]] = replace_char_in_str(grid[pos[0]], pos[1], '.')
+        #moves.append([ch, next])
+        moves[next] = ch
         return pos, moves
     print(f"PUSHING ILLEGAL CHAR: {direction}")
     exit(1)
@@ -230,23 +308,13 @@ def move2(grid, robot, direction):
                 grid[r[0]] = replace_char_in_str(grid[r[0]], r[1], '@')
             return r
         else:
-            r, m = push_ud(grid, next, direction, [])
+            r, m = push_ud2(grid, next, direction, "..")
             if r[0] == robot[0]:
                 return r
-            blank = []
-            if nextch == '[':
-                r2, m2 = push_ud(grid, [next[0], next[1] + 1], direction, [])
-                blank = next[1] + 1
-            elif nextch == ']':
-                r2, m2 = push_ud(grid, [next[0], next[1] + -1], direction, [])
-                blank = next[1] - 1
-            if r2[0] != robot[0]:
-                do_moves(grid, m + m2)
-                grid[robot[0]] = replace_char_in_str(grid[robot[0]], robot[1], '.')
-                grid[r[0]] = replace_char_in_str(grid[r[0]], r[1], '@')
-                grid[r[0]] = replace_char_in_str(grid[r[0]], blank, '.')
-                return r
-            return robot
+            do_moves(grid, m)
+            grid[robot[0]] = replace_char_in_str(grid[robot[0]], robot[1], '.')
+            grid[r[0]] = replace_char_in_str(grid[r[0]], r[1], '@')
+            return r
 
     print(f"ILLEGAL CHAR: {nextch} {robot} {direction}")
     return [-1, -1]
@@ -291,7 +359,7 @@ frames = []
 
 idx = 0
 for c in dirs:
-    if idx == 937:
+    if idx == 194:
         pass
     r = move2(grid2, robot, c)
     if r == [-1, -1]:
@@ -316,7 +384,7 @@ for c in dirs:
         break
     idx += 1
 
-#pprint(grid2)
+pprint(grid2)
 
 print(f"part 2: {compute_gps2(grid2)}")
 
@@ -333,10 +401,10 @@ def visualize(frames, vmax = 1):
         ax.set_title(f"Step {frame}")
         return [im]
 
-    ani = FuncAnimation(fig, update, frames=range(len(frames)), interval=2, repeat=False)
+    ani = FuncAnimation(fig, update, frames=range(len(frames)), interval=1, repeat=False)
     plt.show()
     return ani
 
-#visualize(frames, 100)
+visualize(frames, 100)
 
 

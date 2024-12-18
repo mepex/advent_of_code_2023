@@ -6,10 +6,8 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import numpy as np
 
-
 dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]]
 grid = get_grid_of_chars('input.txt')
-
 
 dir_hash = {'<': [0, -1], '>': [0, 1], '^': [-1, 0], 'v': [1, 0]}
 reverse_dir_hash = {'<': [0, 1], '>': [0, -1], '^': [1, 0], 'v': [-1, 0]}
@@ -31,6 +29,7 @@ for j in range(len(grid)):
     num_boxes += len(boxes)
 
 print(f"number of boxes = {num_boxes}")
+
 
 def find_robot(grid):
     for j in range(len(grid)):
@@ -98,7 +97,6 @@ def compute_gps(grid):
     return gps
 
 
-
 robot = find_robot(grid)
 print("Start:")
 pprint(grid)
@@ -136,7 +134,6 @@ for i in grid2:
 pprint(grid2)
 
 
-
 def push_lr(grid, pos, direction):
     global dir_hash, reverse_dir_hash
     d = dir_hash[direction]
@@ -165,6 +162,7 @@ def push_lr(grid, pos, direction):
     print(f"PUSHING ILLEGAL CHAR: {direction}")
     exit(1)
 
+
 def do_moves(grid, moves):
     for k, v in moves.items():
         m_ch = v
@@ -184,43 +182,45 @@ def move_box(grid, pos, direction):
     y, x = pos
 
     if direction == '^':
-        hole = grid[y-1][x:x+2]
+        hole = grid[y - 1][x:x + 2]
     else:
-        hole = grid[y+1][x:x+2]
+        hole = grid[y + 1][x:x + 2]
     inc = -1 if direction == "^" else 1
-    moves = [(y,x)]
+    moves = [(y, x)]
     if '#' in hole:
         return False, []
     if hole == "[]":
-        movable, m1 = move_box(grid, (y+inc, x), direction)
+        movable, m1 = move_box(grid, (y + inc, x), direction)
         return movable, moves + m1
     if hole == "][":
-        movable1, m1 = move_box(grid, (y+inc, x-1), direction)
-        movable2, m2 = move_box(grid, (y+inc, x+1), direction)
+        movable1, m1 = move_box(grid, (y + inc, x - 1), direction)
+        movable2, m2 = move_box(grid, (y + inc, x + 1), direction)
         if movable1 and movable2:
             return True, moves + m1 + m2
     if hole == "].":
-        movable1, m1 = move_box(grid, (y+inc, x - 1), direction)
+        movable1, m1 = move_box(grid, (y + inc, x - 1), direction)
         if movable1:
             return True, moves + m1
     if hole == ".[":
-        movable2, m2 = move_box(grid, (y+inc, x + 1), direction)
+        movable2, m2 = move_box(grid, (y + inc, x + 1), direction)
         if movable2:
             return True, moves + m2
     if hole == "..":
         return True, moves
     return False, []
 
-def do_move_boxes(grid, boxes : list, direction):
+
+def do_move_boxes(grid, boxes: list, direction):
+    # gotta move boxes from the outside in!
     boxes = sorted(boxes)
     inc = -1 if direction == "^" else 1
     if inc == 1:
         boxes.reverse()
     for b in boxes:
         grid[b[0]] = replace_char_in_str(grid[b[0]], b[1], '.')
-        grid[b[0]] = replace_char_in_str(grid[b[0]], b[1]+1, '.')
-        grid[b[0]+inc] = replace_char_in_str(grid[b[0]+inc], b[1], '[')
-        grid[b[0] + inc] = replace_char_in_str(grid[b[0] + inc], b[1]+1, ']')
+        grid[b[0]] = replace_char_in_str(grid[b[0]], b[1] + 1, '.')
+        grid[b[0] + inc] = replace_char_in_str(grid[b[0] + inc], b[1], '[')
+        grid[b[0] + inc] = replace_char_in_str(grid[b[0] + inc], b[1] + 1, ']')
 
 
 def move2(grid, robot, direction):
@@ -251,7 +251,7 @@ def move2(grid, robot, direction):
                     grid[next[0]] = replace_char_in_str(grid[next[0]], next[1], '@')
                     return next
             else:
-                movable, moves = move_box(grid, [robot[0] + inc, robot[1]-1], direction)
+                movable, moves = move_box(grid, [robot[0] + inc, robot[1] - 1], direction)
                 if movable:
                     do_move_boxes(grid, moves, direction)
                     grid[robot[0]] = replace_char_in_str(grid[robot[0]], robot[1], '.')
@@ -262,6 +262,7 @@ def move2(grid, robot, direction):
     print(f"ILLEGAL CHAR: {nextch} {robot} {direction}")
     return [-1, -1]
 
+
 def find_robots(grid):
     cnt = 0
     for j in range(len(grid)):
@@ -269,6 +270,7 @@ def find_robots(grid):
         if i != -1:
             cnt += 1
     return cnt
+
 
 def grid_valid(grid, num_boxes, robot, r, c):
     count_l = 0
@@ -280,13 +282,14 @@ def grid_valid(grid, num_boxes, robot, r, c):
         boxes = [i for i, letter in enumerate(grid[j]) if letter == '[']
         count_l += len(boxes)
         for b in boxes:
-            if grid[j][b+1] != ']':
+            if grid[j][b + 1] != ']':
                 return False
         boxes = [i for i, letter in enumerate(grid[j]) if letter == ']']
         count_r += len(boxes)
     if count_l == count_r == num_boxes:
         return True
     return False
+
 
 def compute_gps2(grid):
     gps = 0
@@ -295,16 +298,6 @@ def compute_gps2(grid):
         for b in boxes:
             gps += 100 * j + b
     return gps
-
-def calculate_gps_sum(grid):
-    total = 0
-    for r, row in enumerate(grid):
-        for c, cell in enumerate(row):
-            if cell == 'O' or cell == '[':
-                total += (100 * r) + c
-    return total
-
-print(calculate_gps_sum(grid2), file=f)
 
 
 robot = find_robot(grid2)
@@ -317,19 +310,19 @@ frames = []
 idx = 0
 f = open('mylog.log', 'w')
 for c in dirs:
-    if idx == 936:
-        pass
     r = move2(grid2, robot, c)
     if r == [-1, -1]:
-        break
+        print(f'BIG ERROR at {idx}')
+        exit(1)
 
     if not grid_valid(grid2, num_boxes, robot, r, c):
         print(f"Move {idx}/{moves}: {c}:")
         pprint(grid2)
         print(f"boxes fucked at {idx} {r} {c}")
         print("Previous frame:")
-        pprint(frames[idx-1])
-        break
+        pprint(frames[idx - 1])
+        print("ERROR!")
+        exit(1)
     #print(f"Move {idx} {c}")
     robot = r
     #pprint(grid2)
@@ -337,17 +330,18 @@ for c in dirs:
     if find_robots(grid2) > 1:
         print(f"BREAK on MOVE {idx}")
         break
-    print(calculate_gps_sum(grid2), file=f)
+    #print(calculate_gps_sum(grid2), file=f)
     idx += 1
 
 print(idx)
 
 pprint(grid2)
 
-print(f"part 2: {calculate_gps_sum(grid2)}")
+print(f"part 2: {compute_gps2(grid2)}")
 
-def visualize(frames, vmax = 1):
-    grid = np.zeros((len(frames[0]), len(frames[0][0])), dtype = int)
+
+def visualize(frames, vmax=1):
+    grid = np.zeros((len(frames[0]), len(frames[0][0])), dtype=int)
     fig, ax = plt.subplots()
     im = ax.imshow(grid, interpolation='none', aspect='auto', vmin=0, vmax=vmax)
 
@@ -364,5 +358,3 @@ def visualize(frames, vmax = 1):
     return ani
 
 #visualize(frames, 100)
-
-

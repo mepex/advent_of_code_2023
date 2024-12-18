@@ -50,4 +50,22 @@ def get_grid_neighbors(shape, y, x):
         n.remove((y, x))
     return list(set(n))
 
+def flood_fill(pos):
+    global grid, visited, grid_shape, region
+    y = pos[0]
+    x = pos[1]
+    v = grid[y][x]
+    visited[y][x] = 1
+    region[y][x] = 1
+    perim = 4
+    area = 1
+    for n in get_grid_neighbors(grid_shape, y, x):
+        if grid[n[0]][n[1]] == v:
+            perim -= 1
+            if not visited[n[0]][n[1]]:
+                p, a = flood_fill(n)
+                area += a
+                perim += p
+    return perim, area
+
 

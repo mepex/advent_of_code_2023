@@ -8,7 +8,7 @@ import numpy as np
 
 
 dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]]
-grid = get_grid_of_chars('sample4.txt')
+grid = get_grid_of_chars('input.txt')
 
 
 dir_hash = {'<': [0, -1], '>': [0, 1], '^': [-1, 0], 'v': [1, 0]}
@@ -98,6 +98,7 @@ def compute_gps(grid):
     return gps
 
 
+
 robot = find_robot(grid)
 print("Start:")
 pprint(grid)
@@ -128,7 +129,12 @@ for j in range(len(grid2)):
             l[i] = "@."
     grid2[j] = ''.join(l)
 
+f = open('m_startgrid.txt', 'w')
+for i in grid2:
+    print(i, file=f)
+
 pprint(grid2)
+
 
 
 def push_lr(grid, pos, direction):
@@ -206,9 +212,11 @@ def move_box(grid, pos, direction):
     return False, []
 
 def do_move_boxes(grid, boxes : list, direction):
-    boxes.reverse()
+    boxes = sorted(boxes)
+    inc = -1 if direction == "^" else 1
+    if inc == 1:
+        boxes.reverse()
     for b in boxes:
-        inc = -1 if direction == "^" else 1
         grid[b[0]] = replace_char_in_str(grid[b[0]], b[1], '.')
         grid[b[0]] = replace_char_in_str(grid[b[0]], b[1]+1, '.')
         grid[b[0]+inc] = replace_char_in_str(grid[b[0]+inc], b[1], '[')
@@ -288,6 +296,17 @@ def compute_gps2(grid):
             gps += 100 * j + b
     return gps
 
+def calculate_gps_sum(grid):
+    total = 0
+    for r, row in enumerate(grid):
+        for c, cell in enumerate(row):
+            if cell == 'O' or cell == '[':
+                total += (100 * r) + c
+    return total
+
+print(calculate_gps_sum(grid2), file=f)
+
+
 robot = find_robot(grid2)
 print(robot)
 
@@ -296,8 +315,9 @@ moves = len(dirs)
 frames = []
 
 idx = 0
+f = open('mylog.log', 'w')
 for c in dirs:
-    if idx == 194:
+    if idx == 936:
         pass
     r = move2(grid2, robot, c)
     if r == [-1, -1]:
@@ -310,18 +330,21 @@ for c in dirs:
         print("Previous frame:")
         pprint(frames[idx-1])
         break
-    print(f"Move {idx} {c}")
+    #print(f"Move {idx} {c}")
     robot = r
-    pprint(grid2)
+    #pprint(grid2)
     frames.append(deepcopy(grid2))
     if find_robots(grid2) > 1:
         print(f"BREAK on MOVE {idx}")
         break
+    print(calculate_gps_sum(grid2), file=f)
     idx += 1
+
+print(idx)
 
 pprint(grid2)
 
-print(f"part 2: {compute_gps2(grid2)}")
+print(f"part 2: {calculate_gps_sum(grid2)}")
 
 def visualize(frames, vmax = 1):
     grid = np.zeros((len(frames[0]), len(frames[0][0])), dtype = int)
@@ -340,6 +363,6 @@ def visualize(frames, vmax = 1):
     plt.show()
     return ani
 
-visualize(frames, 100)
+#visualize(frames, 100)
 
 

@@ -92,6 +92,12 @@ def part2(grid_str, steps):
 
     expanded_grid_str = expand_grid_str(grid_str)
     grid, start_pos = analyze_grid_str(expanded_grid_str)
+    f = open('a_startgrid.txt', 'w')
+
+    for i in grid:
+        print(''.join(i), file = f)
+    print(calculate_gps_sum(grid), file=f)
+    f = open('answer.log', 'w')
 
     r, c = start_pos
     for step in steps:
@@ -100,6 +106,7 @@ def part2(grid_str, steps):
 
         # Immediately blocked
         if grid[nr][nc] == '#':
+            print(calculate_gps_sum(grid), file=f)
             continue
 
         # Simple slide to adjacent free space
@@ -107,6 +114,7 @@ def part2(grid_str, steps):
             grid[r][c] = '.'
             grid[nr][nc] = '@'
             r, c = nr, nc
+            print(calculate_gps_sum(grid), file=f)
             continue
 
         # Special cases
@@ -122,6 +130,7 @@ def part2(grid_str, steps):
 
             # Boxes are flush against a wall, no movement
             if grid[r][peek_c] == '#':
+                print(calculate_gps_sum(grid), file=f)
                 continue
 
             # If we hit an open space, shift the previous cells 1 unit over
@@ -177,6 +186,7 @@ def part2(grid_str, steps):
                 grid[r][c] = '.'
                 grid[nr][c] = '@'
                 r, c = nr, nc
+        print(calculate_gps_sum(grid), file=f)
 
     return calculate_gps_sum(grid)
 

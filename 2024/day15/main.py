@@ -5,6 +5,7 @@ from copy import deepcopy
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import numpy as np
+from IPython import display
 
 dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]]
 grid = get_grid_of_chars('input.txt')
@@ -354,7 +355,12 @@ def visualize(frames, vmax=1):
         return [im]
 
     ani = FuncAnimation(fig, update, frames=range(len(frames)), interval=200, repeat=False)
-    plt.show()
+    #plt.show()
     return ani
 
-#visualize(frames, 100)
+ani = visualize(frames, 100)
+video = ani.to
+
+
+# good practice to close the plt object.
+plt.close()
